@@ -1,83 +1,33 @@
-# MobX example
+#### ทดลองการเขียน Next.js + mobx + typescript
+---------
 
-Usually splitting your app state into `pages` feels natural but sometimes you'll want to have global state for your app. This is an example on how you can use MobX that also works with our universal rendering approach. This is just a way you can do it but it's not the only one.
+###### อธิบาย structure
 
-In this example we are going to display a digital clock that updates every second. The first render is happening in the server and then the browser will take over. To illustrate this, the server rendered clock will have a different background color than the client one.
+```
+front-end-next-typescript (อันนี้ยังไม่ได้สร้างใน project นี้)
+|
+└─── core
+|     |
+|     └─── components // เก็บ component ที่ใช้สำหรับ reuse ได้
+|     └─── config // เก็บ config ของ project เช่น tsconfig.js tailwind.config.js เป็นต้น
+|     └─── style // เก็บพวกไฟล์ css
+|
+└───features
+│       └─── TodoList
+│               └───components // เก็บ component ของ feature TodoList
+│               └───models // เก็บ Type ของตัวแปรที่ใช้ใน feature TodoList
+│               └───services // เอาไว้สำหรับ api ของ feature
+│               └───store // ที่เก็บ state ของ TodoList Feature
+│
+└───pages // เอาไว้เก็บหน้าเพจที่แสดง component
+|     └─── api // อันนี้ไม่ต้องสนใจเป็น api mock มาให้เล่นเฉยๆ ถ้าอยากเล่นก็เข้าไปดูได้นะ (localhost:3000/api/todolist) เป็น code ที่ mock เอาไว้ยกตัวอย่างของ feature/TodoList/services เฉยๆ 
+|     └─── index.tsx
+|     └─── todolist.tsx
+|
+└─── utils
+      └─── api.tsx
 
-![](http://i.imgur.com/JCxtWSj.gif)
-
-This example is a mobx-react-lite port of the [with-mobx](https://github.com/vercel/next.js/tree/master/examples/with-mobx) example. MobX support has been implemented using React Hooks.
-
-## Deploy your own
-
-Deploy the example using [Vercel](https://vercel.com):
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/project?template=https://github.com/vercel/next.js/tree/canary/examples/with-mobx-react-lite)
-
-## How to use
-
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init) or [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) to bootstrap the example:
-
-```bash
-npx create-next-app --example with-mobx-react-lite with-mobx-react-lite-app
-# or
-yarn create next-app --example with-mobx-react-lite with-mobx-react-lite-app
 ```
 
-Deploy it to the cloud with [Vercel](https://vercel.com/import?filter=next.js&utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+----- ปล. ลองเทียบกับ sit-careers-frontend ดู
 
-## Implementation details
-
-The initial store data is returned from the `initializeData` function that recycles existing store data if it already exists.
-
-```jsx
-function initializeData(initialData = store || {}) {
-  const { lastUpdate = Date.now(), light } = initialData
-  return {
-    lastUpdate,
-    light: Boolean(light),
-  }
-}
-```
-
-The observable store is created in a function component by passing a plain JavaScript object to the `useObservable` hook. Actions on the observable store (`start` and `stop`) are created in the same scope as the `store` in `store.js` and exported as named exports.
-
-```js
-store = useObservable(initializeData(props.initialData))
-
-start = useCallback(
-  action(() => {
-    // Async operation that mutates the store
-  })
-)
-
-stop = () => {
-  // Does not mutate the store
-}
-```
-
-The component creates and exports a new React context provider that will make the store accessible to all of its descendents.
-
-```jsx
-return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
-```
-
-The store is accessible at any depth by using the `StoreContext`.
-
-```js
-const store = useContext(StoreContext)
-```
-
-The clock, under `components/Clock.js`, reacts to changes in the observable `store` by means of the `useObserver` hook.
-
-```jsx
-return (
-  <div>
-    // ...
-    {useObserver(() => (
-      <Clock lastUpdate={store.lastUpdate} light={store.light} />
-    ))}
-    // ...
-  </div>
-)
-```

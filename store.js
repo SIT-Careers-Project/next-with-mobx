@@ -1,6 +1,7 @@
-import { action } from 'mobx'
-import { useObservable, useStaticRendering } from 'mobx-react-lite'
 import { createContext, useCallback } from 'react'
+import { useObservable, useStaticRendering } from 'mobx-react-lite'
+
+import { action } from 'mobx'
 
 const isServer = typeof window === 'undefined'
 // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -20,24 +21,7 @@ function initializeData(initialData = store || {}) {
 }
 
 function InjectStoreContext({ children, initialData }) {
-  let timerInterval = null
   store = useObservable(initializeData(initialData))
-
-  start = useCallback(
-    action(() => {
-      timerInterval = setInterval(() => {
-        store.lastUpdate = Date.now()
-        store.light = true
-      }, 1000)
-    })
-  )
-
-  stop = () => {
-    if (timerInterval) {
-      clearInterval(timerInterval)
-    }
-  }
-
   return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
 }
 
